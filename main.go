@@ -52,6 +52,7 @@ func main() {
 		Client:              mgr.GetClient(),
 		Resolver:            resolv,
 		DefaultIngressClass: defaultIngressClass,
+		IngressHosts:        map[string][]string{},
 	}
 
 	nodeController := &controllers.NodeReconciler{

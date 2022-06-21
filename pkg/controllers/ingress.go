@@ -15,7 +15,7 @@ type IngressReconciler struct {
 	Resolver            *resolver.Resolver
 	DefaultIngressClass string
 
-	ingressHosts map[string][]string
+	IngressHosts map[string][]string
 }
 
 func (r *IngressReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
@@ -39,11 +39,11 @@ func (r *IngressReconciler) onDelete(_ context.Context, ingress *v1.Ingress) (ct
 		r.Resolver.RemoveHost(rule.Host)
 	}
 
-	for _, host := range r.ingressHosts[key] {
+	for _, host := range r.IngressHosts[key] {
 		r.Resolver.RemoveHost(host)
 	}
 
-	delete(r.ingressHosts, key)
+	delete(r.IngressHosts, key)
 
 	return ctrl.Result{}, nil
 }
@@ -51,7 +51,7 @@ func (r *IngressReconciler) onDelete(_ context.Context, ingress *v1.Ingress) (ct
 func (r *IngressReconciler) onChange(_ context.Context, ingress *v1.Ingress) (ctrl.Result, error) {
 	key := getIngressKey(ingress)
 
-	for _, host := range r.ingressHosts[key] {
+	for _, host := range r.IngressHosts[key] {
 		r.Resolver.RemoveHost(host)
 	}
 
@@ -64,10 +64,10 @@ func (r *IngressReconciler) onChange(_ context.Context, ingress *v1.Ingress) (ct
 	}
 
 	for _, rule := range ingress.Spec.Rules {
-		r.ingressHosts[key] = append(r.ingressHosts[key], rule.Host)
+		r.IngressHosts[key] = append(r.IngressHosts[key], rule.Host)
 	}
 
-	for _, host := range r.ingressHosts[key] {
+	for _, host := range r.IngressHosts[key] {
 		r.Resolver.AddHost(host, pool)
 	}
 
